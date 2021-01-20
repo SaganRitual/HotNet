@@ -28,7 +28,7 @@
 import Foundation
 import Accelerate
 
-struct Bloat16: CustomStringConvertible {
+struct Float16: CustomStringConvertible {
 
     var rawValue: UInt16
 
@@ -103,31 +103,31 @@ struct Bloat16: CustomStringConvertible {
     }
 
     init(_ value: Float) {
-        self.rawValue = Bloat16.float_to_float16(value: value)
+        self.rawValue = Float16.float_to_float16(value: value)
     }
 
     var floatValue: Float {
-        return Bloat16.float16_to_float(value: self.rawValue)
+        return Float16.float16_to_float(value: self.rawValue)
     }
 
     var description: String {
         return self.floatValue.description
     }
 
-    static func + (lhs: Bloat16, rhs: Bloat16) -> Bloat16 {
-        return Bloat16(lhs.floatValue + rhs.floatValue)
+    static func + (lhs: Float16, rhs: Float16) -> Float16 {
+        return Float16(lhs.floatValue + rhs.floatValue)
     }
 
-    static func - (lhs: Bloat16, rhs: Bloat16) -> Bloat16 {
-        return Bloat16(lhs.floatValue - rhs.floatValue)
+    static func - (lhs: Float16, rhs: Float16) -> Float16 {
+        return Float16(lhs.floatValue - rhs.floatValue)
     }
 
-    static func * (lhs: Bloat16, rhs: Bloat16) -> Bloat16 {
-        return Bloat16(lhs.floatValue * rhs.floatValue)
+    static func * (lhs: Float16, rhs: Float16) -> Float16 {
+        return Float16(lhs.floatValue * rhs.floatValue)
     }
 
-    static func / (lhs: Bloat16, rhs: Bloat16) -> Bloat16 {
-        return Bloat16(lhs.floatValue / rhs.floatValue)
+    static func / (lhs: Float16, rhs: Float16) -> Float16 {
+        return Float16(lhs.floatValue / rhs.floatValue)
     }
 }
 

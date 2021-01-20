@@ -3,52 +3,25 @@
 import Foundation
 import MetalPerformanceShaders
 
-class DataSourceCnn: NSObject, MPSCNNConvolutionDataSource {
-    let pBiases: UnsafeMutablePointer<Float>
-    let pWeights: UnsafeMutableRawPointer
-
-    let convolutionDescriptor: MPSCNNConvolutionDescriptor
+struct CnnLayerOutputDescriptor {
+    let activationFunction: MPSCNNNeuron?
+    let cNeurons: Int
 
     init(
-        weights: [Float], biases: [Float],
-        convolutionDescriptor: MPSCNNConvolutionDescriptor
+        _ activationFunction: MPSCNNNeuron? = MPSCNNNeuronTanH(), _ cNeurons: Int
     ) {
-        self.pWeights = UnsafeMutableRawPointer.allocate(
-            byteCount: weights.count * MemoryLayout<Float>.size,
-            alignment: MemoryLayout<Float>.alignment
-        )
-
-        self.pWeights.initializeMemory(
-            as: Float.self, from: weights, count: weights.count
-        )
-
-        self.pBiases = UnsafeMutablePointer.allocate(capacity: biases.count)
-        self.pBiases.initialize(from: biases, count: biases.count)
-
-        self.convolutionDescriptor = convolutionDescriptor
+        self.activationFunction = activationFunction
+        self.cNeurons = cNeurons
     }
-
-    func dataType() ->   MPSDataType { .float32 }
-    func descriptor() -> MPSCNNConvolutionDescriptor { convolutionDescriptor }
-    func weights() ->    UnsafeMutableRawPointer { pWeights }
-    func biasTerms() ->  UnsafeMutablePointer<Float>? { pBiases }
-
-    func load() -> Bool { true }
-
-    func purge() { }
-
-    func label() -> String? { nil }
-
-    func copy(with zone: NSZone? = nil) -> Any { false }
-
 }
 
 class HotLayerCnn {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
-    weak var device: MTLDevice!
     let commandQueue: MTLCommandQueue
+    weak var device: MTLDevice!
+    let isAsync: Bool
 
     let filter: MPSCNNFullyConnected
     let inputImage: MPSImage
@@ -57,7 +30,7 @@ class HotLayerCnn {
     var outputBuffer: UnsafeMutableRawPointer
 
     init(
-        device: MTLDevice,
+        device: MTLDevice, isAsync: Bool,
         cNeuronsIn: Int, cNeuronsOut: Int,
         weights: [Float], biases: [Float],
         outputBuffer: UnsafeMutableRawPointer,
@@ -67,6 +40,7 @@ class HotLayerCnn {
         self.cNeuronsOut = cNeuronsOut
         self.device = device
         self.outputBuffer = outputBuffer
+        self.isAsync = isAsync
 
         self.commandQueue = device.makeCommandQueue()!
 
@@ -99,18 +73,13 @@ class HotLayerCnn {
         self.outputImage = MPSImage(device: device, imageDescriptor: outputImgDesc)
     }
 
-    func activate(inputBuffer: [Float]) {
-        activate(inputBuffer: inputBuffer, waitForResult: true)
-    }
-
     func activate(
         inputBuffer: UnsafeRawPointer,
-        _ onComplete: (() -> Void)? = nil,
-        waitForResult: Bool = false
+        _ onComplete: (() -> Void)? = nil
     ) {
         let ib = inputBuffer.bindMemory(to: Float.self, capacity: cNeuronsIn)
         let ic = UnsafeBufferPointer(start: ib, count: cNeuronsIn)
-        let input16 = Bloat16.floats_to_float16s(values: ic.map { $0 })
+        let input16 = Float16.floats_to_float16s(values: ic.map { $0 })
         
         input16.withUnsafeBufferPointer { ptr in
           for i in 0..<inputImage.texture.arrayLength {
@@ -123,7 +92,6 @@ class HotLayerCnn {
           }
         }
 
-        let commandQueue = device.makeCommandQueue()!
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
         filter.encode(
@@ -133,14 +101,14 @@ class HotLayerCnn {
 
         commandBuffer.commit()
 
-        if waitForResult {
-            commandBuffer.waitUntilCompleted()
-            getActivationResult()
-        } else {
+        if isAsync {
             commandBuffer.addCompletedHandler { _ in
                 self.getActivationResult()
                 onComplete!()
             }
+        } else {
+            commandBuffer.waitUntilCompleted()
+            getActivationResult()
         }
     }
 

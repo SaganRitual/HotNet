@@ -8,7 +8,7 @@ print("Hello, World!")
 
 let semaphore = DispatchSemaphore(value: 0)
 
-struct LayerOutputDescriptor {
+struct BnnLayerOutputDescriptor {
     let activationFunction: BNNSActivation
     let cNeurons: Int
 
@@ -27,9 +27,9 @@ func bnn() {
 
     let bnn = HotNetBnn(
         layout: [
-            LayerOutputDescriptor(.identity, 4),
-            LayerOutputDescriptor(.identity, 4),
-            LayerOutputDescriptor(.identity, 4)
+            BnnLayerOutputDescriptor(.identity, 4),
+            BnnLayerOutputDescriptor(.identity, 4),
+            BnnLayerOutputDescriptor(.identity, 4)
         ], parameters: parameters
     )
 
@@ -61,13 +61,28 @@ func cnn() {
     let gpus = MTLCopyAllDevices()
     let device = gpus[1]
 
+    let parameters = (0..<2).flatMap { _ in
+        [Float](repeating: 1, count: 16) + [Float](repeating: 0, count: 4)
+    }
+
+    let cnn = HotNetCnn(
+        layout: [
+            CnnLayerOutputDescriptor(nil, 4),
+            CnnLayerOutputDescriptor(nil, 4),
+            CnnLayerOutputDescriptor(nil, 4)
+        ], parameters: parameters, isAsync: false
+    )
+
+    let cnnResult = cnn.activate(input: [1, 2, 3, 4])
+    print("cnnResult \(cnnResult.map { $0 })")
+
     let pOutput = UnsafeMutableRawPointer.allocate(
         byteCount: 4 * MemoryLayout<Float>.size,
         alignment: MemoryLayout<Float>.alignment
     )
 
     let layer = HotLayerCnn(
-        device: device,
+        device: device, isAsync: false,
         cNeuronsIn: 4, cNeuronsOut: 4,
         weights: [Float](repeating: 1, count: 16),
         biases: [Float](repeating: 0, count: 4),

@@ -1,14 +1,21 @@
 // We are a way for the cosmos to know itself. -- C. Sagan
 
 import Foundation
+import MetalPerformanceShaders
 
-class HotNetBnn {
-    let layers: [HotLayerBnn]!
+class HotNetCnn {
+    let gpus = MTLCopyAllDevices()
+    let device: MTLDevice
+
+    var layers: [HotLayerCnn]!
     var intermediateBuffers = [UnsafeMutableRawPointer]()
 
-    var outputBuffer: UnsafeBufferPointer<Float>
+    var outputBuffer: UnsafeBufferPointer<Float>!
 
-    init(layout: [BnnLayerOutputDescriptor], parameters: [Float]) {
+    init(
+        layout: [CnnLayerOutputDescriptor], parameters: [Float], isAsync: Bool
+    ) {
+        device = gpus[1]
 
         var intermediateBuffers = [UnsafeMutableRawPointer]()
 
@@ -27,7 +34,8 @@ class HotNetBnn {
 
             var parametersIt = parameters.makeIterator()
 
-            return HotLayerBnn(
+            return HotLayerCnn(
+                device: self.device, isAsync: isAsync,
                 cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
                 weights: (0..<cWeights).map { _ in parametersIt.next()! },
                 biases: (0..<cBiases).map  { _ in parametersIt.next()! },
