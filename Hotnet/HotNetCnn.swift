@@ -13,7 +13,7 @@ class HotNetCnn {
     var outputBuffer: UnsafeBufferPointer<Float>!
 
     init(
-        layout: [CnnLayerOutputDescriptor], parameters: [Float], isAsync: Bool
+        layout: [NeuralNet.LayerOutputDescriptor], parameters: [Float], isAsync: Bool
     ) {
         device = gpus[1]
 
@@ -40,7 +40,7 @@ class HotNetCnn {
                 weights: (0..<cWeights).map { _ in parametersIt.next()! },
                 biases: (0..<cBiases).map  { _ in parametersIt.next()! },
                 outputBuffer: intermediateBuffer,
-                activationFunction: outputs.activationFunction
+                activationFunction: getActivation(.tanh)
             )
         }
 
@@ -71,5 +71,16 @@ class HotNetCnn {
 
         // Direct access to the motor outputs layer
         return self.outputBuffer
+    }
+}
+
+extension HotNetCnn {
+    func getActivation(
+        _ standardized: NeuralNet.Activation
+    ) -> MPSCNNNeuron? {
+        switch standardized {
+        case .identity: return nil
+        case .tanh:     return MPSCNNNeuron(device: device, neuronDescriptor: MPSNNNeuronDescriptor.cnnNeuronDescriptor(with: .tanH))
+        }
     }
 }

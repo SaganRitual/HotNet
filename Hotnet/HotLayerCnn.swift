@@ -3,18 +3,6 @@
 import Foundation
 import MetalPerformanceShaders
 
-struct CnnLayerOutputDescriptor {
-    let activationFunction: MPSCNNNeuron?
-    let cNeurons: Int
-
-    init(
-        _ activationFunction: MPSCNNNeuron? = MPSCNNNeuronTanH(), _ cNeurons: Int
-    ) {
-        self.activationFunction = activationFunction
-        self.cNeurons = cNeurons
-    }
-}
-
 class HotLayerCnn {
     let cNeuronsIn: Int
     let cNeuronsOut: Int

@@ -1,5 +1,6 @@
 // We are a way for the cosmos to know itself. -- C. Sagan
 
+import Accelerate
 import Foundation
 
 class HotNetBnn {
@@ -8,7 +9,7 @@ class HotNetBnn {
 
     var outputBuffer: UnsafeBufferPointer<Float>
 
-    init(layout: [BnnLayerOutputDescriptor], parameters: [Float]) {
+    init(layout: [NeuralNet.LayerOutputDescriptor], parameters: [Float]) {
 
         var intermediateBuffers = [UnsafeMutableRawPointer]()
 
@@ -32,7 +33,7 @@ class HotNetBnn {
                 weights: (0..<cWeights).map { _ in parametersIt.next()! },
                 biases: (0..<cBiases).map  { _ in parametersIt.next()! },
                 outputBuffer: intermediateBuffer,
-                activationFunction: outputs.activationFunction
+                activationFunction: HotNetBnn.getActivation(.tanh)
             )
         }
 
@@ -63,5 +64,16 @@ class HotNetBnn {
 
         // Direct access to the motor outputs layer
         return self.outputBuffer
+    }
+}
+
+extension HotNetBnn {
+    static func getActivation(
+        _ standardized: NeuralNet.Activation
+    ) -> BNNSActivation {
+        switch standardized {
+        case .identity: return BNNSActivation(function: .identity)
+        case .tanh:     return BNNSActivation(function: .tanh)
+        }
     }
 }
