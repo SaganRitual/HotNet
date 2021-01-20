@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D40FBE4225B118810057010D /* HotNetBnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40FBE4125B118810057010D /* HotNetBnn.swift */; };
 		D435E70425A2664E003D4EB4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70325A2664E003D4EB4 /* main.swift */; };
+		D435E70C25A26693003D4EB4 /* HotLayerBnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */; };
+		D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */; };
+		D4A0B43225B7BD9C00A67292 /* Bloat16.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43125B7BD9C00A67292 /* Bloat16.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,8 +27,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D40FBE3E25B117A30057010D /* SnotLayerCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnotLayerCnn.swift; sourceTree = "<group>"; };
+		D40FBE4125B118810057010D /* HotNetBnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotNetBnn.swift; sourceTree = "<group>"; };
+		D40FBE4525B139E70057010D /* HotLayerMps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerMps.swift; sourceTree = "<group>"; };
 		D435E70025A2664E003D4EB4 /* Hotnet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Hotnet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D435E70325A2664E003D4EB4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerBnn.swift; sourceTree = "<group>"; };
+		D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerCnn.swift; sourceTree = "<group>"; };
+		D4A0B43125B7BD9C00A67292 /* Bloat16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bloat16.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +68,12 @@
 			isa = PBXGroup;
 			children = (
 				D435E70325A2664E003D4EB4 /* main.swift */,
+				D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */,
+				D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */,
+				D40FBE4125B118810057010D /* HotNetBnn.swift */,
+				D40FBE4525B139E70057010D /* HotLayerMps.swift */,
+				D40FBE3E25B117A30057010D /* SnotLayerCnn.swift */,
+				D4A0B43125B7BD9C00A67292 /* Bloat16.swift */,
 			);
 			path = Hotnet;
 			sourceTree = "<group>";
@@ -93,6 +109,7 @@
 				TargetAttributes = {
 					D435E6FF25A2664E003D4EB4 = {
 						CreatedOnToolsVersion = 12.3;
+						LastSwiftMigration = 1230;
 					};
 				};
 			};
@@ -119,7 +136,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D435E70C25A26693003D4EB4 /* HotLayerBnn.swift in Sources */,
+				D4A0B43225B7BD9C00A67292 /* Bloat16.swift in Sources */,
 				D435E70425A2664E003D4EB4 /* main.swift in Sources */,
+				D40FBE4225B118810057010D /* HotNetBnn.swift in Sources */,
+				D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,10 +265,19 @@
 		D435E70825A2664E003D4EB4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DD983V4X84;
 				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -255,10 +285,18 @@
 		D435E70925A2664E003D4EB4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DD983V4X84;
 				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
