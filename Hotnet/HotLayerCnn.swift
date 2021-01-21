@@ -15,7 +15,7 @@ struct CnnLayerOutputDescriptor {
     }
 }
 
-class HotLayerCnn {
+class HotLayerCnn: HotLayerProtocol {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
@@ -32,7 +32,7 @@ class HotLayerCnn {
     init(
         device: MTLDevice, isAsync: Bool,
         cNeuronsIn: Int, cNeuronsOut: Int,
-        weights: [Float], biases: [Float],
+        biases: UnsafeMutableRawPointer?, weights: UnsafeMutableRawPointer,
         outputBuffer: UnsafeMutableRawPointer,
         activationFunction: MPSCNNNeuron? = MPSCNNNeuronTanH()
     ) {
@@ -52,7 +52,7 @@ class HotLayerCnn {
         )
 
         let dataSource = DataSourceCnn(
-            weights: weights, biases: biases,
+            biases: biases, weights: weights,
             convolutionDescriptor: descriptor
         )
 
@@ -73,10 +73,7 @@ class HotLayerCnn {
         self.outputImage = MPSImage(device: device, imageDescriptor: outputImgDesc)
     }
 
-    func activate(
-        inputBuffer: UnsafeRawPointer,
-        _ onComplete: (() -> Void)? = nil
-    ) {
+    func activate(inputBuffer: UnsafeRawPointer) {
         let ib = inputBuffer.bindMemory(to: Float.self, capacity: cNeuronsIn)
         let ic = UnsafeBufferPointer(start: ib, count: cNeuronsIn)
         let input16 = Float16.floats_to_float16s(values: ic.map { $0 })
@@ -100,16 +97,8 @@ class HotLayerCnn {
         )
 
         commandBuffer.commit()
-
-        if isAsync {
-            commandBuffer.addCompletedHandler { _ in
-                self.getActivationResult()
-                onComplete!()
-            }
-        } else {
-            commandBuffer.waitUntilCompleted()
-            getActivationResult()
-        }
+        commandBuffer.waitUntilCompleted()
+        getActivationResult()
     }
 
     private func getActivationResult() {

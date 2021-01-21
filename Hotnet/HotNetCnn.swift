@@ -3,73 +3,39 @@
 import Foundation
 import MetalPerformanceShaders
 
-class HotNetCnn {
-    let gpus = MTLCopyAllDevices()
+struct CNNLayerFactory: HotLayerFactoryProtocol {
     let device: MTLDevice
 
-    var layers: [HotLayerCnn]!
-    var intermediateBuffers = [UnsafeMutableRawPointer]()
-
-    var outputBuffer: UnsafeBufferPointer<Float>!
-
-    init(
-        layout: [CnnLayerOutputDescriptor], parameters: [Float], isAsync: Bool
-    ) {
-        device = gpus[1]
-
-        var intermediateBuffers = [UnsafeMutableRawPointer]()
-
-        layers = zip(layout.dropLast(), layout.dropFirst()).map {
-            (inputs, outputs) in
-
-            let cWeights = inputs.cNeurons * outputs.cNeurons
-            let cBiases = outputs.cNeurons
-
-            let intermediateBuffer = UnsafeMutableRawPointer.allocate(
-                byteCount: outputs.cNeurons * MemoryLayout<Float>.size,
-                alignment: MemoryLayout<Float>.alignment
-            )
-
-            intermediateBuffers.append(intermediateBuffer)
-
-            var parametersIt = parameters.makeIterator()
-
-            return HotLayerCnn(
-                device: self.device, isAsync: isAsync,
-                cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
-                weights: (0..<cWeights).map { _ in parametersIt.next()! },
-                biases: (0..<cBiases).map  { _ in parametersIt.next()! },
-                outputBuffer: intermediateBuffer,
-                activationFunction: outputs.activationFunction
-            )
-        }
-
-        self.intermediateBuffers = intermediateBuffers
-
-        // Point directly to the output buffer of the bottom layer, so
-        // caller can read it without any copying
-        let t = intermediateBuffers.last!.bindMemory(
-            to: Float.self, capacity: layout.last!.cNeurons
-        )
-
-        self.outputBuffer = UnsafeBufferPointer(
-            start: t, count: layout.last!.cNeurons
+    func makeLayer(
+        cNeuronsIn: Int, cNeuronsOut: Int,
+        biases: UnsafeMutableRawPointer?,
+        weights: UnsafeMutableRawPointer,
+        outputBuffer: UnsafeMutableRawPointer,
+        activation: HotNetConfiguration.Activation
+    ) -> HotLayerProtocol {
+        HotLayerCnn(
+            device: self.device, isAsync: false,
+            cNeuronsIn: cNeuronsIn, cNeuronsOut: cNeuronsOut,
+            biases: biases, weights: weights,
+            outputBuffer: outputBuffer,
+            activationFunction:
+                CNNLayerFactory.getActivation(device, activation)
         )
     }
 
-    deinit {
-        intermediateBuffers.forEach { $0.deallocate() }
-    }
+    static func getActivation(
+        _ device: MTLDevice,
+        _ standardized: HotNetConfiguration.Activation
+    ) -> MPSCNNNeuron? {
+        switch standardized {
+        case .identity:
+            return nil
 
-    func activate(input: [Float]) -> UnsafeBufferPointer<Float> {
-        layers.indices.forEach {
-            let layer = layers[$0]
-
-            if $0 == 0 { layer.activate(inputBuffer: input) }
-            else       { layer.activate(inputBuffer: intermediateBuffers[$0 - 1]) }
+        case .tanh:
+            return MPSCNNNeuron(
+                device: device,
+                neuronDescriptor: MPSNNNeuronDescriptor.cnnNeuronDescriptor(with: .tanH)
+            )
         }
-
-        // Direct access to the motor outputs layer
-        return self.outputBuffer
     }
 }

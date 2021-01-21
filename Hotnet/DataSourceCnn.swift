@@ -4,27 +4,18 @@ import Foundation
 import MetalPerformanceShaders
 
 class DataSourceCnn: NSObject, MPSCNNConvolutionDataSource {
-    let pBiases: UnsafeMutablePointer<Float>
+    let pBiases: UnsafeMutablePointer<Float>?
     let pWeights: UnsafeMutableRawPointer
 
     let convolutionDescriptor: MPSCNNConvolutionDescriptor
 
     init(
-        weights: [Float], biases: [Float],
+        biases: UnsafeMutableRawPointer?,
+        weights: UnsafeMutableRawPointer,
         convolutionDescriptor: MPSCNNConvolutionDescriptor
     ) {
-        self.pWeights = UnsafeMutableRawPointer.allocate(
-            byteCount: weights.count * MemoryLayout<Float>.size,
-            alignment: MemoryLayout<Float>.alignment
-        )
-
-        self.pWeights.initializeMemory(
-            as: Float.self, from: weights, count: weights.count
-        )
-
-        self.pBiases = UnsafeMutablePointer.allocate(capacity: biases.count)
-        self.pBiases.initialize(from: biases, count: biases.count)
-
+        self.pWeights = weights
+        self.pBiases = biases == nil ? nil : biases!.assumingMemoryBound(to: Float.self)
         self.convolutionDescriptor = convolutionDescriptor
     }
 

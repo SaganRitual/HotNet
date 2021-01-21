@@ -14,6 +14,8 @@
 		D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43125B7BD9C00A67292 /* Float16.swift */; };
 		D4A0B43A25B7F49900A67292 /* HotNetCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43925B7F49900A67292 /* HotNetCnn.swift */; };
 		D4A0B43F25B7F94B00A67292 /* DataSourceCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */; };
+		D4A0B4AF25BA445300A67292 /* HotNetConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */; };
+		D4BDC42025BA5B2B00190CBE /* HotNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDC41F25BA5B2B00190CBE /* HotNet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +40,8 @@
 		D4A0B43125B7BD9C00A67292 /* Float16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Float16.swift; sourceTree = "<group>"; };
 		D4A0B43925B7F49900A67292 /* HotNetCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotNetCnn.swift; sourceTree = "<group>"; };
 		D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCnn.swift; sourceTree = "<group>"; };
+		D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfiguration.swift; path = HotNet/HotNetConfiguration.swift; sourceTree = SOURCE_ROOT; };
+		D4BDC41F25BA5B2B00190CBE /* HotNet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNet.swift; path = HotNet/HotNet.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +81,9 @@
 				D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */,
 				D40FBE4125B118810057010D /* HotNetBnn.swift */,
 				D4A0B43925B7F49900A67292 /* HotNetCnn.swift */,
+				D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */,
 				D40FBE4525B139E70057010D /* HotLayerMps.swift */,
+				D4BDC41F25BA5B2B00190CBE /* HotNet.swift */,
 			);
 			path = Hotnet;
 			sourceTree = "<group>";
@@ -117,7 +123,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D435E6FB25A2664E003D4EB4 /* Build configuration list for PBXProject "Hotnet" */;
+			buildConfigurationList = D435E6FB25A2664E003D4EB4 /* Build configuration list for PBXProject "HotNet" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -145,7 +151,9 @@
 				D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */,
 				D435E70425A2664E003D4EB4 /* main.swift in Sources */,
 				D40FBE4225B118810057010D /* HotNetBnn.swift in Sources */,
+				D4BDC42025BA5B2B00190CBE /* HotNet.swift in Sources */,
 				D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */,
+				D4A0B4AF25BA445300A67292 /* HotNetConfiguration.swift in Sources */,
 				D4A0B43A25B7F49900A67292 /* HotNetCnn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -310,7 +318,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D435E6FB25A2664E003D4EB4 /* Build configuration list for PBXProject "Hotnet" */ = {
+		D435E6FB25A2664E003D4EB4 /* Build configuration list for PBXProject "HotNet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D435E70525A2664E003D4EB4 /* Debug */,
