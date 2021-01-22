@@ -2,8 +2,7 @@
 // swiftlint:disable function_body_length
 import Accelerate
 
-class HotLayerBnn {
-
+class HotLayerBnn: HotLayerProtocol {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
@@ -11,9 +10,6 @@ class HotLayerBnn {
     let inDescription: BNNSNDArrayDescriptor
     let outDescription: BNNSNDArrayDescriptor
     let weightsDescription: BNNSNDArrayDescriptor
-
-    let pBiases: UnsafeMutableRawPointer
-    let pWeights: UnsafeMutableRawPointer
 
     let activation: BNNSActivation
     let filter: BNNSFilter
@@ -23,7 +19,7 @@ class HotLayerBnn {
 
     init(
         cNeuronsIn: Int, cNeuronsOut: Int,
-        weights: [Float], biases: [Float],
+        biases: UnsafeMutableRawPointer?, weights: UnsafeMutableRawPointer,
         outputBuffer: UnsafeMutableRawPointer,
         activationFunction: BNNSActivation = .init(function: .tanh)
     ) {
@@ -32,31 +28,13 @@ class HotLayerBnn {
         self.outputBuffer = outputBuffer
         self.activation = activationFunction
 
-        self.pWeights = UnsafeMutableRawPointer.allocate(
-            byteCount: weights.count * MemoryLayout<Float>.size,
-            alignment: MemoryLayout<Float>.alignment
-        )
-
-        self.pWeights.initializeMemory(
-            as: Float.self, from: weights, count: weights.count
-        )
-
-        self.pBiases = UnsafeMutableRawPointer.allocate(
-            byteCount: biases.count * MemoryLayout<Float>.size,
-            alignment: MemoryLayout<Float>.alignment
-        )
-
-        self.pBiases.initializeMemory(
-            as: Float.self, from: biases, count: biases.count
-        )
-
         let flags = BNNSNDArrayFlags(0)
 
         self.biasesDescription = BNNSNDArrayDescriptor(
             flags: flags, layout: BNNSDataLayoutVector,
             size: (cNeuronsOut, 0, 0, 0, 0, 0, 0, 0),
             stride: (0, 0, 0, 0, 0, 0, 0, 0),
-            data: pBiases, data_type: .float,
+            data: biases, data_type: .float,
             table_data: nil, table_data_type: .float,
             data_scale: 0, data_bias: 0
         )
@@ -83,7 +61,7 @@ class HotLayerBnn {
             flags: flags, layout: BNNSDataLayoutRowMajorMatrix,
             size: (cNeuronsIn, cNeuronsOut, 0, 0, 0, 0, 0, 0),
             stride: (0, 0, 0, 0, 0, 0, 0, 0),
-            data: pWeights, data_type: .float,
+            data: weights, data_type: .float,
             table_data: nil, table_data_type: .float,
             data_scale: 0, data_bias: 0)
 
