@@ -28,7 +28,7 @@ func bnn() {
     pBiases.initializeMemory(as: Float.self, repeating: 0, count: cBiases)
 
     let configuration = HotNetConfiguration(
-        activation: .identity, isAsync: false,
+        activation: .identity, isAsync: true,
         layerDescriptors: [
             .init(cNeurons: 4), .init(cNeurons: 4), .init(cNeurons: 4)
         ],
@@ -37,8 +37,9 @@ func bnn() {
 
     let bnn = HotNet(configuration, biases: pBiases, weights: pWeights)
 
-    let bnnResult = bnn.activate(input: [1, 2, 3, 4])
-    print("bnnResult \(bnnResult.map { $0 })")
+    bnn.activate(input: [1, 2, 3, 4]) {
+        print("bnnResult \($0.map { $0 })")
+    }
 
 //    let pOutput = UnsafeMutableRawPointer.allocate(
 //        byteCount: 4 * MemoryLayout<Float>.size,
@@ -83,7 +84,7 @@ func cnn() {
     pBiases.initializeMemory(as: Float.self, repeating: 0, count: cBiases)
 
     let configuration = HotNetConfiguration(
-        activation: .identity, isAsync: false,
+        activation: .identity, isAsync: true,
         layerDescriptors: [
             .init(cNeurons: 4), .init(cNeurons: 4), .init(cNeurons: 4)
         ],
@@ -92,8 +93,11 @@ func cnn() {
 
     let cnn = HotNet(configuration, biases: pBiases, weights: pWeights)
 
-    let cnnResult = cnn.activate(input: [1, 2, 3, 4])
-    print("cnnResult \(cnnResult.map { $0 })")
+    cnn.activate(input: [1, 2, 3, 4]) {
+        print("cnnResult \($0.map { $0 })")
+        semaphore.signal()
+    }
+
 //
 //    let pOutput = UnsafeMutableRawPointer.allocate(
 //        byteCount: 4 * MemoryLayout<Float>.size,
@@ -114,7 +118,6 @@ func cnn() {
 //    let f = UnsafeBufferPointer(start: t, count: 4)
 //
 //    print("cnn layer result \(f.map { $0 })")
-    semaphore.signal()
 }
 
 bnn()

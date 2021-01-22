@@ -15,9 +15,19 @@ protocol HotLayerFactoryProtocol {
 
 protocol HotLayerProtocol {
     func activate(inputBuffer: UnsafeRawPointer)
+    func activate(
+        inputBuffer: UnsafeRawPointer,
+        _ onComplete: @escaping () -> Void
+    )
 }
 
 class HotNet {
+    static let netDispatch = DispatchQueue(
+        label: "net.dispatch.rob",
+        attributes: .concurrent,
+        target: DispatchQueue.global()
+    )
+
     let layers: [HotLayerProtocol]!
     let intermediateBuffers: [UnsafeMutableRawPointer]
 
@@ -73,6 +83,35 @@ class HotNet {
 
         // Direct access to the motor outputs layer
         return self.outputBuffer
+    }
+
+    func activate(
+        input: [Float],
+        _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
+    ) {
+        var layerIx = 0
+
+        func activate_A() { HotNet.netDispatch.async(execute: activate_B) }
+
+        func activate_B() {
+            let layer = layers[layerIx]
+
+            if layerIx == 0 { layer.activate(inputBuffer: input, activate_C) }
+            else            { layer.activate(inputBuffer: intermediateBuffers[layerIx - 1], activate_C) }
+        }
+
+        func activate_C() {
+            layerIx += 1
+
+            if layerIx >= layers.count {
+                DispatchQueue.main.async { onComplete(self.outputBuffer) }
+                return
+            }
+
+            activate_A()
+        }
+
+        activate_A()
     }
 }
 

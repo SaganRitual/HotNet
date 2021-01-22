@@ -1,14 +1,5 @@
 // We are a way for the cosmos to know itself. -- C. Sagan
 
-protocol HotNetProtocol: class {
-    func activate(input: [Float]) -> UnsafeBufferPointer<Float>
-//
-//    func activate(
-//        input: [Float],
-//        _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
-//    )
-}
-
 class HotNetConfiguration {
     let activation: Activation
     let counts: ParameterCounts

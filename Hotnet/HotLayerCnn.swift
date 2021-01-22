@@ -74,20 +74,28 @@ class HotLayerCnn: HotLayerProtocol {
     }
 
     func activate(inputBuffer: UnsafeRawPointer) {
-        let ib = inputBuffer.bindMemory(to: Float.self, capacity: cNeuronsIn)
-        let ic = UnsafeBufferPointer(start: ib, count: cNeuronsIn)
-        let input16 = Float16.floats_to_float16s(values: ic.map { $0 })
-        
-        input16.withUnsafeBufferPointer { ptr in
-          for i in 0..<inputImage.texture.arrayLength {
-            let region = MTLRegion(origin: MTLOriginMake(0, 0, 0), size: MTLSizeMake(1, 1, 1))
-            inputImage.texture.replace(
-                region: region, mipmapLevel: 0, slice: i,
-                withBytes: ptr.baseAddress!.advanced(by: i * 4),
-                bytesPerRow: MemoryLayout<UInt16>.stride * 4, bytesPerImage: 0
-            )
-          }
+        let commandBuffer = activate_(inputBuffer: inputBuffer)
+
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
+        getActivationResult()
+    }
+
+    func activate(
+        inputBuffer: UnsafeRawPointer, _ onComplete: @escaping () -> Void
+    ) {
+        let commandBuffer = activate_(inputBuffer: inputBuffer)
+
+        commandBuffer.addCompletedHandler { _ in
+            self.getActivationResult()
+            onComplete()
         }
+
+        commandBuffer.commit()
+    }
+
+    private func activate_(inputBuffer: UnsafeRawPointer) -> MTLCommandBuffer {
+        setupInputBuffer(inputBuffer)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
@@ -96,12 +104,13 @@ class HotLayerCnn: HotLayerProtocol {
             destinationImage: outputImage
         )
 
-        commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
-        getActivationResult()
+        return commandBuffer
     }
 
-    private func getActivationResult() {
+}
+
+private extension HotLayerCnn {
+    func getActivationResult() {
         let width = outputImage.width, height = outputImage.height
         let fc = outputImage.featureChannels, texture = outputImage.texture
         let count =  width * height * fc
@@ -120,6 +129,23 @@ class HotLayerCnn: HotLayerProtocol {
                            from: region,
                            mipmapLevel: 0,
                            slice: i)
+        }
+    }
+
+    func setupInputBuffer(_ inputBuffer: UnsafeRawPointer) {
+        let ib = inputBuffer.bindMemory(to: Float.self, capacity: cNeuronsIn)
+        let ic = UnsafeBufferPointer(start: ib, count: cNeuronsIn)
+        let input16 = Float16.floats_to_float16s(values: ic.map { $0 })
+
+        input16.withUnsafeBufferPointer { ptr in
+          for i in 0..<inputImage.texture.arrayLength {
+            let region = MTLRegion(origin: MTLOriginMake(0, 0, 0), size: MTLSizeMake(1, 1, 1))
+            inputImage.texture.replace(
+                region: region, mipmapLevel: 0, slice: i,
+                withBytes: ptr.baseAddress!.advanced(by: i * 4),
+                bytesPerRow: MemoryLayout<UInt16>.stride * 4, bytesPerImage: 0
+            )
+          }
         }
     }
 }
