@@ -5,13 +5,13 @@ import MetalPerformanceShaders
 
 class DataSourceCnn: NSObject, MPSCNNConvolutionDataSource {
     let pBiases: UnsafeMutablePointer<Float>?
-    let pWeights: UnsafeMutableRawPointer
+    let pWeights: UnsafeMutableRawPointer?
 
     let convolutionDescriptor: MPSCNNConvolutionDescriptor
 
     init(
         biases: UnsafeMutableRawPointer?,
-        weights: UnsafeMutableRawPointer,
+        weights: UnsafeMutableRawPointer?,
         convolutionDescriptor: MPSCNNConvolutionDescriptor
     ) {
         self.pWeights = weights
@@ -21,8 +21,8 @@ class DataSourceCnn: NSObject, MPSCNNConvolutionDataSource {
 
     func dataType() ->   MPSDataType { .float32 }
     func descriptor() -> MPSCNNConvolutionDescriptor { convolutionDescriptor }
-    func weights() ->    UnsafeMutableRawPointer { pWeights }
-    func biasTerms() ->  UnsafeMutablePointer<Float>? { pBiases }
+    func weights() ->    UnsafeMutableRawPointer { pWeights! }
+    func biasTerms() ->  UnsafeMutablePointer<Float>? { pBiases! }
 
     func load() -> Bool { true }
 

@@ -2,7 +2,7 @@
 // swiftlint:disable function_body_length
 import Accelerate
 
-class HotLayerBnn: HotLayerProtocol {
+class HotLayerBnn {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
@@ -19,20 +19,25 @@ class HotLayerBnn: HotLayerProtocol {
 
     init(
         cNeuronsIn: Int, cNeuronsOut: Int,
-        biases: UnsafeMutableRawPointer?, weights: UnsafeMutableRawPointer,
+        biases: UnsafeMutableRawPointer?,
+        weights: UnsafeMutableRawPointer?,
         outputBuffer: UnsafeMutableRawPointer,
-        activationFunction: BNNSActivation = .init(function: .tanh)
+        activation: BNNSActivation = .init(function: .tanh)
     ) {
         self.cNeuronsIn = cNeuronsIn
         self.cNeuronsOut = cNeuronsOut
         self.outputBuffer = outputBuffer
-        self.activation = activationFunction
+        self.activation = activation
 
         let flags = BNNSNDArrayFlags(0)
 
+        let cBiases = biases == nil ? 0 : cNeuronsOut
+        let cWeightsIn = weights == nil ? 0 : cNeuronsIn
+        let cWeightsOut = weights == nil ? 0 : cNeuronsOut
+
         self.biasesDescription = BNNSNDArrayDescriptor(
             flags: flags, layout: BNNSDataLayoutVector,
-            size: (cNeuronsOut, 0, 0, 0, 0, 0, 0, 0),
+            size: (cBiases, 0, 0, 0, 0, 0, 0, 0),
             stride: (0, 0, 0, 0, 0, 0, 0, 0),
             data: biases, data_type: .float,
             table_data: nil, table_data_type: .float,
@@ -59,7 +64,7 @@ class HotLayerBnn: HotLayerProtocol {
 
         self.weightsDescription = BNNSNDArrayDescriptor(
             flags: flags, layout: BNNSDataLayoutRowMajorMatrix,
-            size: (cNeuronsIn, cNeuronsOut, 0, 0, 0, 0, 0, 0),
+            size: (cWeightsIn, cWeightsOut, 0, 0, 0, 0, 0, 0),
             stride: (0, 0, 0, 0, 0, 0, 0, 0),
             data: weights, data_type: .float,
             table_data: nil, table_data_type: .float,
@@ -68,7 +73,7 @@ class HotLayerBnn: HotLayerProtocol {
         self.layerParameters = BNNSLayerParametersFullyConnected(
             i_desc: inDescription, w_desc: weightsDescription,
             o_desc: outDescription, bias: biasesDescription,
-            activation: activationFunction
+            activation: activation
         )
 
         self.filter = BNNSFilterCreateLayerFullyConnected(

@@ -3,19 +3,15 @@
 class HotNetConfiguration {
     let activation: Activation
     let counts: ParameterCounts
-    let isAsync: Bool
     let layerDescriptors: [LayerDescriptor]
-    let layerFactory: HotLayerFactoryProtocol
 
     init(
-        activation: Activation, isAsync: Bool,
-        layerDescriptors: [LayerDescriptor], layerFactory: HotLayerFactoryProtocol
+        activation: Activation,
+        layerDescriptors: [LayerDescriptor]
     ) {
         self.activation = activation
         self.counts = HotNetConfiguration.computeNetParameters(layerDescriptors)
-        self.isAsync = isAsync
         self.layerDescriptors = layerDescriptors
-        self.layerFactory = layerFactory
     }
 
     enum Activation { case identity, tanh }

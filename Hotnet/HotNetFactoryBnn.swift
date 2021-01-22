@@ -3,23 +3,7 @@
 import Accelerate
 import Foundation
 
-struct BNNLayerFactory: HotLayerFactoryProtocol {
-    func makeLayer(
-        cNeuronsIn: Int, cNeuronsOut: Int,
-        biases: UnsafeMutableRawPointer?,
-        weights: UnsafeMutableRawPointer,
-        outputBuffer: UnsafeMutableRawPointer,
-        activation: HotNetConfiguration.Activation
-    ) -> HotLayerProtocol {
-        HotLayerBnn(
-            cNeuronsIn: cNeuronsIn, cNeuronsOut: cNeuronsOut,
-            biases: biases, weights: weights,
-            outputBuffer: outputBuffer,
-            activationFunction: BNNLayerFactory.getActivation(activation)
-        )
-
-    }
-
+struct BNNLayerFactory {
     static func getActivation(
         _ standardized: HotNetConfiguration.Activation
     ) -> BNNSActivation {
