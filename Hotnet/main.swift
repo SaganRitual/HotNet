@@ -9,6 +9,10 @@ print("Hello, World!")
 let semaphore = DispatchSemaphore(value: 0)
 let theDevice = MTLCopyAllDevices()[1]
 
+let callbackDispatch = DispatchQueue(
+    label: "callback", attributes: .concurrent, target: DispatchQueue.global()
+)
+
 func bnn() {
 
     let cWeights = 32
@@ -35,7 +39,10 @@ func bnn() {
         ]
     )
 
-    let bnn = HotNetBnn(configuration, biases: pBiases, weights: pWeights)
+    let bnn = HotNetBnn(
+        configuration, biases: pBiases, weights: pWeights,
+        callbackDispatch: callbackDispatch
+    )
 
     bnn.activate(input: [1, 2, 3, 4]) {
         print("bnnResult \($0.map { $0 })")
@@ -68,7 +75,10 @@ func cnn() {
         ]
     )
 
-    let cnn = HotNetCnn(configuration, biases: pBiases, weights: pWeights)
+    let cnn = HotNetCnn(
+        configuration, biases: pBiases, weights: pWeights,
+        callbackDispatch: callbackDispatch
+    )
 
     cnn.activate(input: [1, 2, 3, 4]) {
         print("cnnResult \($0.map { $0 })")

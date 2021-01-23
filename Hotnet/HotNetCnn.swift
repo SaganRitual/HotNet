@@ -7,17 +7,32 @@ class HotNetCnn: HotNet {
     static let theDevice = MTLCopyAllDevices()[1]
     static let theCommandQueue = theDevice.makeCommandQueue()!
 
+    let cNeuronsIn: Int
+    let float16Transfer: UnsafeMutableRawPointer
+    let float16Buffer: UnsafeMutableBufferPointer<UInt16>
+
     let intermediateImages: [MPSImage]
     let layers: [HotLayerCnn]
 
+    let origin: MTLOrigin
+    let region: MTLRegion
+    let size: MTLSize
+
+    let inputImageDescriptor: MPSImageDescriptor
+    let inputImage: MPSImage
+
     let finalOutputBuffer: UnsafeMutableRawPointer
 
-    deinit { finalOutputBuffer.deallocate() }
+    deinit {
+        finalOutputBuffer.deallocate()
+        float16Transfer.deallocate()
+    }
 
     init(
         _ configuration: HotNetConfiguration,
         biases: UnsafeMutableRawPointer,
-        weights: UnsafeMutableRawPointer
+        weights: UnsafeMutableRawPointer,
+        callbackDispatch: DispatchQueue = DispatchQueue.main
     ) {
         (intermediateImages, layers) = HotNetCnn.makeLayers(
             configuration,
@@ -43,7 +58,30 @@ class HotNetCnn: HotNet {
             start: t, count: configuration.layerDescriptors.last!.cNeurons
         )
 
-        super.init(outputBuffer: outputBuffer)
+        self.cNeuronsIn = layers.first!.cNeuronsIn
+
+        self.float16Transfer = UnsafeMutableRawPointer.allocate(
+            byteCount: self.cNeuronsIn * MemoryLayout<UInt16>.size,
+            alignment: MemoryLayout<UInt16>.alignment
+        )
+
+        let u = float16Transfer.bindMemory(to: UInt16.self, capacity: self.cNeuronsIn)
+        self.float16Buffer = UnsafeMutableBufferPointer(start: u, count: self.cNeuronsIn)
+
+        self.inputImageDescriptor = MPSImageDescriptor(
+            channelFormat: .float16, width: 1, height: 1,
+            featureChannels: cNeuronsIn
+        )
+
+        self.inputImage = MPSImage(
+            device: HotNetCnn.theDevice, imageDescriptor: inputImageDescriptor
+        )
+
+        self.origin = MTLOriginMake(0, 0, 0)
+        self.size = MTLSizeMake(1, 1, 1)
+        self.region = MTLRegion(origin: origin, size: size)
+
+        super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
     var onComplete: ((UnsafeBufferPointer<Float>) -> Void)?
@@ -80,37 +118,17 @@ class HotNetCnn: HotNet {
 
     func onActivationComplete(_: MTLCommandBuffer) {
         getActivationResult()
-        DispatchQueue.main.async { [self] in onComplete!(outputBuffer) }
+        super.callbackDispatch.async { [self] in onComplete!(outputBuffer) }
     }
 
-    func setupInputBuffer(_ inputBuffer: UnsafeRawPointer) -> MPSImage {
-        let cn = layers.first!.cNeuronsIn
-        let ib = inputBuffer.bindMemory(to: Float.self, capacity: cn)
-        let ic = UnsafeBufferPointer(start: ib, count: cn)
-        let input16 = Float16.floats_to_float16s(values: ic.map { $0 })
+    func setupInputBuffer(_ floatBuffer: UnsafeRawPointer) -> MPSImage {
+        Float16.floats_to_float16s(input: floatBuffer, output: float16Buffer)
 
-        let inputImgDesc = MPSImageDescriptor(
-            channelFormat: .float16, width: 1, height: 1,
-            featureChannels: cn
+        inputImage.texture.replace(
+            region: region, mipmapLevel: 0,
+            withBytes: float16Transfer,
+            bytesPerRow: MemoryLayout<UInt16>.stride * 4
         )
-
-        let inputImage = MPSImage(
-            device: HotNetCnn.theDevice, imageDescriptor: inputImgDesc
-        )
-
-        input16.withUnsafeBufferPointer { ptr in
-            for i in 0..<inputImage.texture.arrayLength {
-                let origin = MTLOriginMake(0, 0, 0)
-                let size = MTLSizeMake(1, 1, 1)
-                let region = MTLRegion(origin: origin, size: size)
-
-                inputImage.texture.replace(
-                    region: region, mipmapLevel: 0, slice: i,
-                    withBytes: ptr.baseAddress!.advanced(by: i * 4),
-                    bytesPerRow: MemoryLayout<UInt16>.stride * 4, bytesPerImage: 0
-                )
-            }
-        }
 
         return inputImage
     }

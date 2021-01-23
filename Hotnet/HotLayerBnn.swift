@@ -86,9 +86,4 @@ class HotLayerBnn {
     func activate(inputBuffer: UnsafeRawPointer) {
         BNNSFilterApply(filter, inputBuffer, outputBuffer)
     }
-
-    func activate(inputBuffer: UnsafeRawPointer, _ onComplete: () -> Void) {
-        activate(inputBuffer: inputBuffer)
-        onComplete()
-    }
 }

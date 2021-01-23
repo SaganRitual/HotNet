@@ -10,9 +10,15 @@ class HotNet {
         target: DispatchQueue.global()
     )
 
+    let callbackDispatch: DispatchQueue
+
     let outputBuffer: UnsafeBufferPointer<Float>
 
-    init(outputBuffer: UnsafeBufferPointer<Float>) {
+    init(
+        outputBuffer: UnsafeBufferPointer<Float>,
+        callbackDispatch: DispatchQueue
+    ) {
         self.outputBuffer = outputBuffer
+        self.callbackDispatch = callbackDispatch
     }
 }

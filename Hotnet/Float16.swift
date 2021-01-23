@@ -68,6 +68,26 @@ struct Float16: CustomStringConvertible {
         return output[0]
     }
 
+    static func floats_to_float16s(
+        input: UnsafeRawPointer, output: UnsafeMutableBufferPointer<UInt16>
+    ) {
+        let width = vImagePixelCount(output.count)
+
+        let pInput = UnsafeMutableRawPointer(mutating: input)
+        var sourceBuffer = vImage_Buffer(
+            data: pInput, height: 1, width: width,
+            rowBytes: MemoryLayout<Float>.size * output.count
+        )
+
+        let pOutput = UnsafeMutableRawPointer(output.baseAddress)
+        var destinationBuffer = vImage_Buffer(
+            data: pOutput, height: 1, width: width,
+            rowBytes: MemoryLayout<UInt16>.size * output.count
+        )
+
+        vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &destinationBuffer, 0)
+    }
+
     static func floats_to_float16s(values: [Float]) -> [UInt16] {
         let inputs = values
         let width = vImagePixelCount(values.count)

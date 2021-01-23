@@ -16,7 +16,8 @@ class HotNetBnn: HotNet {
     init(
         _ configuration: HotNetConfiguration,
         biases: UnsafeMutableRawPointer,
-        weights: UnsafeMutableRawPointer
+        weights: UnsafeMutableRawPointer,
+        callbackDispatch: DispatchQueue = DispatchQueue.main
     ) {
         (intermediateBuffers, layers) = HotNetBnn.makeLayers(
             configuration, biases: biases, weights: weights
@@ -32,7 +33,7 @@ class HotNetBnn: HotNet {
             start: t, count: configuration.layerDescriptors.last!.cNeurons
         )
 
-        super.init(outputBuffer: outputBuffer)
+        super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
     func activate(input: [Float]) -> UnsafeBufferPointer<Float> {
@@ -51,29 +52,18 @@ class HotNetBnn: HotNet {
         input: [Float],
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) {
-        var layerIx = 0
-
-        func activate_A() { HotNet.netDispatch.async(execute: activate_B) }
-
-        func activate_B() {
-            let layer = layers[layerIx]
-
-            if layerIx == 0 { layer.activate(inputBuffer: input, activate_C) }
-            else            { layer.activate(inputBuffer: intermediateBuffers[layerIx - 1], activate_C) }
+        HotNet.netDispatch.async { [self] in
+            activate_(input)
+            callbackDispatch.async { onComplete(outputBuffer) }
         }
+    }
 
-        func activate_C() {
-            layerIx += 1
+    func activate_(_ input: [Float]) {
+        layers.first!.activate(inputBuffer: input)
 
-            if layerIx >= layers.count {
-                DispatchQueue.main.async { onComplete(self.outputBuffer) }
-                return
-            }
-
-            activate_A()
+        for (layer, buffer) in zip(layers.dropFirst(), intermediateBuffers) {
+            layer.activate(inputBuffer: buffer)
         }
-
-        activate_A()
     }
 }
 
