@@ -11,10 +11,9 @@ class HotLayerCnn {
     weak var outputImage: MPSImage!
 
     weak var device: MTLDevice!
-    weak var commandBuffer: MTLCommandBuffer!
 
     init(
-        device: MTLDevice, commandBuffer: MTLCommandBuffer,
+        device: MTLDevice,
         cNeuronsIn: Int, cNeuronsOut: Int,
         biases: UnsafeMutableRawPointer?, weights: UnsafeMutableRawPointer?,
         outputImage: MPSImage,
@@ -23,7 +22,6 @@ class HotLayerCnn {
         self.cNeuronsIn = cNeuronsIn
         self.cNeuronsOut = cNeuronsOut
         self.device = device
-        self.commandBuffer = commandBuffer
         self.outputImage = outputImage
 
         let descriptor = MPSCNNConvolutionDescriptor(
@@ -41,7 +39,7 @@ class HotLayerCnn {
         self.filter = MPSCNNFullyConnected(device: device, weights: dataSource)
     }
 
-    func encodeActivation(inputImage: MPSImage) {
+    func encodeActivation(inputImage: MPSImage, commandBuffer: MTLCommandBuffer) {
         filter.encode(
             commandBuffer: commandBuffer, sourceImage: inputImage,
             destinationImage: outputImage

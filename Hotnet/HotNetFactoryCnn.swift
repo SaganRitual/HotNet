@@ -13,7 +13,7 @@ struct CNNLayerFactory {
 
         case .tanh:
             return MPSCNNNeuron(
-                device: theDevice,
+                device: HotNetCnn.theDevice,
                 neuronDescriptor: MPSNNNeuronDescriptor.cnnNeuronDescriptor(with: .tanH)
             )
         }

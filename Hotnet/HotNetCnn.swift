@@ -4,8 +4,8 @@ import Foundation
 import MetalPerformanceShaders
 
 class HotNetCnn: HotNet {
-    let commandBuffer: MTLCommandBuffer
-    let commandQueue: MTLCommandQueue
+    static let theDevice = MTLCopyAllDevices()[1]
+    static let theCommandQueue = theDevice.makeCommandQueue()!
 
     let intermediateImages: [MPSImage]
     let layers: [HotLayerCnn]
@@ -19,12 +19,9 @@ class HotNetCnn: HotNet {
         biases: UnsafeMutableRawPointer,
         weights: UnsafeMutableRawPointer
     ) {
-        commandQueue = theDevice.makeCommandQueue()!
-        commandBuffer = commandQueue.makeCommandBuffer()!
-
         (intermediateImages, layers) = HotNetCnn.makeLayers(
             configuration,
-            device: theDevice, commandBuffer: commandBuffer,
+            device: HotNetCnn.theDevice,
             biases: biases, weights: weights
         )
 
@@ -47,8 +44,6 @@ class HotNetCnn: HotNet {
         )
 
         super.init(outputBuffer: outputBuffer)
-
-        commandBuffer.addCompletedHandler(onActivationComplete)
     }
 
     var onComplete: ((UnsafeBufferPointer<Float>) -> Void)?
@@ -57,6 +52,10 @@ class HotNetCnn: HotNet {
         input: [Float],
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) {
+        let commandBuffer = HotNetCnn.theCommandQueue.makeCommandBuffer()!
+
+        commandBuffer.addCompletedHandler(onActivationComplete)
+
         self.onComplete = onComplete
 
         let inputImage = setupInputBuffer(input)
@@ -64,8 +63,16 @@ class HotNetCnn: HotNet {
         layers.indices.forEach {
             let layer = layers[$0]
 
-            if $0 == 0 { layer.encodeActivation(inputImage: inputImage) }
-            else       { layer.encodeActivation(inputImage: intermediateImages[$0 - 1]) }
+            if $0 == 0 {
+                layer.encodeActivation(
+                    inputImage: inputImage, commandBuffer: commandBuffer
+                )
+            } else {
+                layer.encodeActivation(
+                    inputImage: intermediateImages[$0 - 1],
+                    commandBuffer: commandBuffer
+                )
+            }
         }
 
         commandBuffer.commit()
@@ -87,7 +94,9 @@ class HotNetCnn: HotNet {
             featureChannels: cn
         )
 
-        let inputImage = MPSImage(device: theDevice, imageDescriptor: inputImgDesc)
+        let inputImage = MPSImage(
+            device: HotNetCnn.theDevice, imageDescriptor: inputImgDesc
+        )
 
         input16.withUnsafeBufferPointer { ptr in
             for i in 0..<inputImage.texture.arrayLength {
@@ -139,7 +148,7 @@ private extension HotNetCnn {
 
     static func makeLayers(
         _ configuration: HotNetConfiguration,
-        device: MTLDevice, commandBuffer: MTLCommandBuffer,
+        device: MTLDevice,
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?
     ) -> ([MPSImage], [HotLayerCnn]) {
@@ -186,7 +195,7 @@ private extension HotNetCnn {
             )
 
             return HotLayerCnn(
-                device: device, commandBuffer: commandBuffer,
+                device: device,
                 cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
                 biases: biases, weights: weights,
                 outputImage: image,
