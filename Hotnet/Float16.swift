@@ -45,6 +45,8 @@ struct Float16: CustomStringConvertible {
         var destinationBuffer = vImage_Buffer(data: pOutput, height: 1, width: 1, rowBytes: MemoryLayout<UInt16>.size)
         vImageConvert_PlanarFtoPlanar16F(&sourceBuffer, &destinationBuffer, 0)
 
+        defer { [pInput, pOutput].forEach { $0.deallocate() } }
+
         return output[0]
     }
 
@@ -61,6 +63,8 @@ struct Float16: CustomStringConvertible {
         var destinationBuffer = vImage_Buffer(data: pOutput, height: 1, width: 1, rowBytes: MemoryLayout<Float>.size)
         vImageConvert_Planar16FtoPlanarF(&sourceBuffer, &destinationBuffer, 0)
 
+        defer { [pInput, pOutput].forEach { $0.deallocate() } }
+
         return output[0]
     }
 
@@ -68,10 +72,10 @@ struct Float16: CustomStringConvertible {
         let inputs = values
         let width = vImagePixelCount(values.count)
 
-        let pInput = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Float>.size, alignment: MemoryLayout<Float>.alignment)
+        let pInput = UnsafeMutableRawPointer.allocate(byteCount: values.count * MemoryLayout<Float>.size, alignment: MemoryLayout<Float>.alignment)
         pInput.initializeMemory(as: Float.self, from: inputs, count: inputs.count)
 
-        let pOutput = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<UInt16>.size, alignment: MemoryLayout<UInt16>.alignment)
+        let pOutput = UnsafeMutableRawPointer.allocate(byteCount: values.count * MemoryLayout<UInt16>.size, alignment: MemoryLayout<UInt16>.alignment)
 
         var sourceBuffer = vImage_Buffer(data: pInput, height: 1, width: width, rowBytes: MemoryLayout<Float>.size * values.count)
         var destinationBuffer = vImage_Buffer(data: pOutput, height: 1, width: width, rowBytes: MemoryLayout<UInt16>.size * values.count)
@@ -79,6 +83,8 @@ struct Float16: CustomStringConvertible {
 
         let pp = pOutput.assumingMemoryBound(to: UInt16.self)
         let ff = UnsafeBufferPointer(start: pp, count: values.count)
+
+        defer { [pInput, pOutput].forEach { $0.deallocate() } }
 
         return ff.map { $0 }
     }
@@ -98,6 +104,8 @@ struct Float16: CustomStringConvertible {
 
         let pp = pOutput.assumingMemoryBound(to: Float.self)
         let ff = UnsafeBufferPointer(start: pp, count: values.count)
+
+        defer { [pInput, pOutput].forEach { $0.deallocate() } }
 
         return ff.map { $0 }
     }
