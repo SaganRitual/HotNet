@@ -86,8 +86,8 @@ class HotNetCnn: HotNet {
 
     var onComplete: ((UnsafeBufferPointer<Float>) -> Void)?
 
-    func activate(
-        input: [Float],
+    override func activate(
+        input: UnsafeRawPointer,
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) {
         let commandBuffer = HotNetCnn.theCommandQueue.makeCommandBuffer()!

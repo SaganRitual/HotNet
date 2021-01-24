@@ -21,4 +21,13 @@ class HotNet {
         self.outputBuffer = outputBuffer
         self.callbackDispatch = callbackDispatch
     }
+
+    func activate(input: UnsafeRawPointer) {
+        fatalError("Not in base class")
+    }
+
+    func activate(
+        input: UnsafeRawPointer,
+        _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
+    ) { fatalError("Not in base class") }
 }

@@ -36,20 +36,13 @@ class HotNetBnn: HotNet {
         super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
-    func activate(input: [Float]) -> UnsafeBufferPointer<Float> {
-        layers.indices.forEach {
-            let layer = layers[$0]
-
-            if $0 == 0 { layer.activate(inputBuffer: input) }
-            else       { layer.activate(inputBuffer: intermediateBuffers[$0 - 1]) }
-        }
-
-        // Direct access to the motor outputs layer
+    func activate(input: UnsafeRawPointer) -> UnsafeBufferPointer<Float> {
+        activate_(input)
         return self.outputBuffer
     }
 
-    func activate(
-        input: [Float],
+    override func activate(
+        input: UnsafeRawPointer,
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) {
         HotNet.netDispatch.async { [self] in
@@ -58,7 +51,7 @@ class HotNetBnn: HotNet {
         }
     }
 
-    func activate_(_ input: [Float]) {
+    private func activate_(_ input: UnsafeRawPointer) {
         layers.first!.activate(inputBuffer: input)
 
         for (layer, buffer) in zip(layers.dropFirst(), intermediateBuffers) {

@@ -87,8 +87,7 @@ func cnn() {
 }
 
 bnn()
+semaphore.wait()
 
 for _ in 0..<100 { cnn() }
-
 for _ in 0..<100 { semaphore.wait() }
-semaphore.wait()
