@@ -72,10 +72,10 @@ private extension HotNetBlas {
 
         let layers: [HotLayerBlas] = zip(
             configuration.layerDescriptors.enumerated().dropLast(),
-            configuration.layerDescriptors.enumerated().dropFirst()
+            configuration.layerDescriptors.dropFirst()
         ).map {
             let (upperLayerIndex, inputs) = $0
-            let (lowerLayerIndex, outputs) = $1
+            let outputs = $1
 
             let cWeights = inputs.cNeurons * outputs.cNeurons
             let cBiases = outputs.cNeurons
@@ -88,14 +88,15 @@ private extension HotNetBlas {
             intermediateBuffers.append(intermediateBuffer)
 
             defer {
-                if pWeights != nil && upperLayerIndex == 0 {
-                    pWeights! += cWeights * MemoryLayout<Float>.size
+                if !HotNet.isInputLayer(upperLayerIndex) {
+                    pWeights = HotNet.advanceBufferPointer(
+                        pElements: pWeights, cElements: cWeights
+                    )
                 }
 
-                if pBiases != nil &&
-                   lowerLayerIndex < configuration.layerDescriptors.count - 1 {
-                    pBiases! += cBiases * MemoryLayout<Float>.size
-                }
+                pBiases = HotNet.advanceBufferPointer(
+                    pElements: pBiases, cElements: cBiases
+                )
             }
 
             return HotLayerBlas(
