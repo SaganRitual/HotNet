@@ -44,7 +44,7 @@ func bnn() {
         callbackDispatch: callbackDispatch
     )
 
-    bnn.activate(input: [1, 2, 3, 4]) {
+    bnn.activate(input: [Float]([1, 2, 3, 4])) {
         print("bnnResult \($0.map { $0 })")
         semaphore.signal()
     }

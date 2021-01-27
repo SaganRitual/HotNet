@@ -208,7 +208,7 @@ private extension HotNetCnn {
                 }
             }
 
-            let activation = CNNLayerFactory.getActivation(
+            let activation = HotNetCnn.getActivation(
                 configuration.activation
             )
 
