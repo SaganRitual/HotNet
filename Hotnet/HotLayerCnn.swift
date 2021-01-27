@@ -46,3 +46,20 @@ class HotLayerCnn {
         )
     }
 }
+
+extension HotLayerCnn {
+    static func getActivation(
+        _ standardized: HotNetConfiguration.Activation
+    ) -> MPSCNNNeuron? {
+        switch standardized {
+        case .identity:
+            return nil
+
+        case .tanh:
+            return MPSCNNNeuron(
+                device: HotNetCnn.theDevice,
+                neuronDescriptor: MPSNNNeuronDescriptor.cnnNeuronDescriptor(with: .tanH)
+            )
+        }
+    }
+}

@@ -87,3 +87,14 @@ class HotLayerBnn {
         BNNSFilterApply(filter, inputBuffer, outputBuffer)
     }
 }
+
+extension HotLayerBnn {
+    static func getActivation(
+        _ standardized: HotNetConfiguration.Activation
+    ) -> BNNSActivation {
+        switch standardized {
+        case .identity: return BNNSActivation(function: .identity)
+        case .tanh:     return BNNSActivation(function: .tanh)
+        }
+    }
+}

@@ -4,8 +4,6 @@ import Accelerate
 import Foundation
 
 class HotNetBnn: HotNet {
-    let layerFactory = BNNLayerFactory()
-
     let intermediateBuffers: [UnsafeMutableRawPointer]
     let layers: [HotLayerBnn]
 
@@ -36,7 +34,9 @@ class HotNetBnn: HotNet {
         super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
-    func activate(input: UnsafeRawPointer) -> UnsafeBufferPointer<Float> {
+    override func activate(
+        input: UnsafeRawPointer
+    ) -> UnsafeBufferPointer<Float> {
         activate_(input)
         return self.outputBuffer
     }
@@ -72,10 +72,10 @@ private extension HotNetBnn {
 
         let layers: [HotLayerBnn] = zip(
             configuration.layerDescriptors.enumerated().dropLast(),
-            configuration.layerDescriptors.enumerated().dropFirst()
+            configuration.layerDescriptors.dropFirst()
         ).map {
             let (upperLayerIndex, inputs) = $0
-            let (lowerLayerIndex, outputs) = $1
+            let outputs = $1
 
             let cWeights = inputs.cNeurons * outputs.cNeurons
             let cBiases = outputs.cNeurons
@@ -88,21 +88,22 @@ private extension HotNetBnn {
             intermediateBuffers.append(intermediateBuffer)
 
             defer {
-                if pWeights != nil && upperLayerIndex == 0 {
-                    pWeights! += cWeights * MemoryLayout<Float>.size
+                if !HotNet.isInputLayer(upperLayerIndex) {
+                    pWeights = HotNet.advanceBufferPointer(
+                        pElements: pWeights, cElements: cWeights
+                    )
                 }
 
-                if pBiases != nil &&
-                   lowerLayerIndex < configuration.layerDescriptors.count - 1 {
-                    pBiases! += cBiases * MemoryLayout<Float>.size
-                }
+                pBiases = HotNet.advanceBufferPointer(
+                    pElements: pBiases, cElements: cBiases
+                )
             }
 
             return HotLayerBnn(
                 cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
                 biases: pBiases, weights: pWeights,
                 outputBuffer: intermediateBuffer,
-                activation: BNNLayerFactory.getActivation(configuration.activation)
+                activation: HotLayerBnn.getActivation(configuration.activation)
             )
         }
 

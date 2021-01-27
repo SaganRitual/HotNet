@@ -34,7 +34,9 @@ class HotNetBlas: HotNet {
         super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
-    func activate(input: UnsafeRawPointer) -> UnsafeBufferPointer<Float> {
+    override func activate(
+        input: UnsafeRawPointer
+    ) -> UnsafeBufferPointer<Float> {
         activate_(input)
         return self.outputBuffer
     }

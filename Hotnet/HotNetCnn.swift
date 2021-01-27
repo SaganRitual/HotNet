@@ -158,12 +158,6 @@ class HotNetCnn: HotNet {
 }
 
 private extension HotNetCnn {
-    static func isOutputLayer(
-        _ index: Int, _ configuration: HotNetConfiguration
-    ) -> Bool {
-        index >= configuration.layerDescriptors.count - 1
-    }
-
     static func makeLayers(
         _ configuration: HotNetConfiguration,
         device: MTLDevice,
@@ -184,9 +178,8 @@ private extension HotNetCnn {
             let cWeights = inputs.cNeurons * outputs.cNeurons
             let cBiases = outputs.cNeurons
 
-            let isOutputLayer = HotNetCnn.isOutputLayer(
-                lowerLayerIndex, configuration
-            )
+            let isOutputLayer =
+                HotNet.isOutputLayer(lowerLayerIndex, configuration)
 
             let descriptor = MPSImageDescriptor(
                 channelFormat: isOutputLayer ? .float32 : .float16,
@@ -198,17 +191,18 @@ private extension HotNetCnn {
             intermediateImages.append(image)
 
             defer {
-                if pWeights != nil && upperLayerIndex == 0 {
-                    pWeights! += cWeights * MemoryLayout<Float>.size
+                if !HotNet.isInputLayer(upperLayerIndex) {
+                    pWeights = HotNet.advanceBufferPointer(
+                        pElements: pWeights, cElements: cWeights
+                    )
                 }
 
-                if pBiases != nil &&
-                    !HotNetCnn.isOutputLayer(lowerLayerIndex, configuration) {
-                    pBiases! += cBiases * MemoryLayout<Float>.size
-                }
+                pBiases = HotNet.advanceBufferPointer(
+                    pElements: pBiases, cElements: cBiases
+                )
             }
 
-            let activation = HotNetCnn.getActivation(
+            let activation = HotLayerCnn.getActivation(
                 configuration.activation
             )
 
@@ -218,7 +212,6 @@ private extension HotNetCnn {
                 biases: biases, weights: weights,
                 outputImage: image,
                 activation: activation
-
             )
         }
 

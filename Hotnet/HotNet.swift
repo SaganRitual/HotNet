@@ -22,7 +22,7 @@ class HotNet {
         self.callbackDispatch = callbackDispatch
     }
 
-    func activate(input: UnsafeRawPointer) {
+    func activate(input: UnsafeRawPointer) -> UnsafeBufferPointer<Float> {
         fatalError("Not in base class")
     }
 
@@ -30,4 +30,25 @@ class HotNet {
         input: UnsafeRawPointer,
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) { fatalError("Not in base class") }
+}
+
+extension HotNet {
+    static func advanceBufferPointer(
+        pElements: UnsafeMutableRawPointer?, cElements: Int
+    ) -> UnsafeMutableRawPointer? {
+        var advanced = pElements
+        if advanced != nil {
+            advanced! += cElements * MemoryLayout<Float>.size
+        }
+
+        return advanced
+    }
+
+    static func isInputLayer(_ index: Int) -> Bool { index == 0 }
+
+    static func isOutputLayer(
+        _ index: Int, _ configuration: HotNetConfiguration
+    ) -> Bool {
+        index >= configuration.layerDescriptors.count - 1
+    }
 }
