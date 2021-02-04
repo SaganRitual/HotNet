@@ -3,7 +3,7 @@
 import Foundation
 import MetalPerformanceShaders
 
-class HotLayerCnn {
+class HotLayerDnn {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
@@ -36,14 +36,6 @@ class HotLayerCnn {
             convolutionDescriptor: descriptor
         )
 
-//        let w_ = weights!.bindMemory(to: Float.self, capacity: cNeuronsIn * cNeuronsOut)
-//        let w = UnsafePointer(w_)
-
-//        self.filter = MPSCNNConvolution(
-//            device: device, convolutionDescriptor: descriptor,
-//            kernelWeights: w, biasTerms: nil, flags: .none
-//        )
-
         self.filter = MPSCNNFullyConnected(device: device, weights: dataSource)
     }
 
@@ -55,7 +47,7 @@ class HotLayerCnn {
     }
 }
 
-extension HotLayerCnn {
+extension HotLayerDnn {
     static func getActivation(
         _ standardized: HotNetConfig.Activation
     ) -> MPSCNNNeuron? {
@@ -65,7 +57,7 @@ extension HotLayerCnn {
 
         case .tanh:
             return MPSCNNNeuron(
-                device: HotNetCnn.theDevice,
+                device: HotNetDnn.theDevice,
                 neuronDescriptor: MPSNNNeuronDescriptor.cnnNeuronDescriptor(with: .tanH)
             )
         }

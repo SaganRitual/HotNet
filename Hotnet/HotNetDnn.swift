@@ -3,8 +3,8 @@
 import Foundation
 import MetalPerformanceShaders
 
-class HotNetCnn: HotNet {
-    static let theDevice = MTLCopyAllDevices()[0]
+class HotNetDnn: HotNet {
+    static let theDevice = MTLCopyAllDevices()[1]
     static let theCommandQueue = theDevice.makeCommandQueue()!
 
     let cNeuronsIn: Int
@@ -12,7 +12,7 @@ class HotNetCnn: HotNet {
     let float16Buffer: UnsafeMutableBufferPointer<UInt16>
 
     let intermediateImages: [MPSImage]
-    let layers: [HotLayerCnn]
+    let layers: [HotLayerDnn]
 
     let origin: MTLOrigin
     let region: MTLRegion
@@ -34,9 +34,9 @@ class HotNetCnn: HotNet {
         weights: UnsafeMutableRawPointer,
         callbackDispatch: DispatchQueue = DispatchQueue.main
     ) {
-        (intermediateImages, layers) = HotNetCnn.makeLayers(
+        (intermediateImages, layers) = HotNetDnn.makeLayers(
             configuration,
-            device: HotNetCnn.theDevice,
+            device: HotNetDnn.theDevice,
             biases: biases, weights: weights
         )
 
@@ -74,7 +74,7 @@ class HotNetCnn: HotNet {
         )
 
         self.inputImage = MPSImage(
-            device: HotNetCnn.theDevice, imageDescriptor: inputImageDescriptor
+            device: HotNetDnn.theDevice, imageDescriptor: inputImageDescriptor
         )
 
         self.origin = MTLOriginMake(0, 0, 0)
@@ -90,7 +90,7 @@ class HotNetCnn: HotNet {
         input: UnsafeRawPointer,
         _ onComplete: @escaping (UnsafeBufferPointer<Float>) -> Void
     ) {
-        let commandBuffer = HotNetCnn.theCommandQueue.makeCommandBuffer()!
+        let commandBuffer = HotNetDnn.theCommandQueue.makeCommandBuffer()!
 
         commandBuffer.addCompletedHandler(onActivationComplete)
 
@@ -157,38 +157,61 @@ class HotNetCnn: HotNet {
     }
 }
 
-private extension HotNetCnn {
-
+private extension HotNetDnn {
     static func makeLayers(
         _ configuration: HotNetConfig,
         device: MTLDevice,
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?
-    ) -> ([MPSImage], [HotLayerCnn]) {
+    ) -> ([MPSImage], [HotLayerDnn]) {
         var intermediateImages = [MPSImage]()
+        var pBiases = biases
+        var pWeights = weights
 
-        let buffers = HotNetConfig.Buffers(configuration, biases, weights)
+        let layers: [HotLayerDnn] = zip(
+            configuration.layerDescriptors.enumerated().dropLast(),
+            configuration.layerDescriptors.enumerated().dropFirst()
+        ).map {
+            let (upperLayerIndex, inputs) = $0
+            let (lowerLayerIndex, outputs) = $1
 
-        let layers: [HotLayerCnn] = (0..<configuration.layerDescriptors.count).map { layerIndex in
+            let cWeights = inputs.cNeurons * outputs.cNeurons
+            let cBiases = outputs.cNeurons
+
+            let isOutputLayer =
+                HotNet.isOutputLayer(lowerLayerIndex, configuration)
+
             let descriptor = MPSImageDescriptor(
-                channelFormat: buffers.isOutputLayer ? .float32 : .float16,
-                width: 1, height: 1, featureChannels: buffers.next!.cNeurons
+                channelFormat: isOutputLayer ? .float32 : .float16,
+                width: 1, height: 1, featureChannels: outputs.cNeurons
             )
 
             let image = MPSImage(device: device, imageDescriptor: descriptor)
 
-            if !buffers.isOutputLayer { intermediateImages.append(image) }
+            intermediateImages.append(image)
 
-            defer { buffers.advanceLayer() }
+            defer {
+                if !HotNet.isInputLayer(upperLayerIndex) {
+                    pWeights = HotNet.advanceBufferPointer(
+                        pElements: pWeights, cElements: cWeights
+                    )
+                }
 
-            let activation = HotLayerCnn.getActivation(configuration.activation)
+                pBiases = HotNet.advanceBufferPointer(
+                    pElements: pBiases, cElements: cBiases
+                )
+            }
 
-            return HotLayerCnn(
+            let activation = HotLayerDnn.getActivation(
+                configuration.activation
+            )
+
+            return HotLayerDnn(
                 device: device,
-                cNeuronsIn: buffers.curr.cNeurons,
-                cNeuronsOut: buffers.next!.cNeurons,
-                biases: buffers.biases(), weights: buffers.weights(),
-                outputImage: image, activation: activation
+                cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
+                biases: biases, weights: weights,
+                outputImage: image,
+                activation: activation
             )
         }
 

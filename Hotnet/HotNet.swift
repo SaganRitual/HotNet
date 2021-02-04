@@ -22,6 +22,7 @@ class HotNet {
         self.callbackDispatch = callbackDispatch
     }
 
+    @discardableResult
     func activate(input: UnsafeRawPointer) -> UnsafeBufferPointer<Float> {
         fatalError("Not in base class")
     }
@@ -47,7 +48,7 @@ extension HotNet {
     static func isInputLayer(_ index: Int) -> Bool { index == 0 }
 
     static func isOutputLayer(
-        _ index: Int, _ configuration: HotNetConfiguration
+        _ index: Int, _ configuration: HotNetConfig
     ) -> Bool {
         index >= configuration.layerDescriptors.count - 1
     }

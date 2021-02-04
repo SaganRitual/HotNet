@@ -12,7 +12,7 @@ class HotNetBlas: HotNet {
     }
 
     init(
-        _ configuration: HotNetConfiguration,
+        _ configuration: HotNetConfig,
         biases: UnsafeMutableRawPointer,
         weights: UnsafeMutableRawPointer,
         callbackDispatch: DispatchQueue = DispatchQueue.main
@@ -62,7 +62,7 @@ class HotNetBlas: HotNet {
 
 private extension HotNetBlas {
     static func makeLayers(
-        _ configuration: HotNetConfiguration,
+        _ configuration: HotNetConfig,
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?
     ) -> ([UnsafeMutableRawPointer], [HotLayerBlas]) {

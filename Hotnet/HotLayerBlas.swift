@@ -4,7 +4,7 @@ class HotLayerBlas {
     let cNeuronsIn: Int
     let cNeuronsOut: Int
 
-    let activation: HotNetConfiguration.Activation
+    let activation: HotNetConfig.Activation
 
     let biases: UnsafePointer<Float>?
     let weights: UnsafePointer<Float>?
@@ -17,7 +17,7 @@ class HotLayerBlas {
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?,
         outputBuffer: UnsafeMutableRawPointer,
-        activation: HotNetConfiguration.Activation = .tanh
+        activation: HotNetConfig.Activation = .tanh
     ) {
         self.cNeuronsIn = cNeuronsIn
         self.cNeuronsOut = cNeuronsOut

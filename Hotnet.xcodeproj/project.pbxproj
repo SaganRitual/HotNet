@@ -9,12 +9,17 @@
 /* Begin PBXBuildFile section */
 		D4111C5B25C1C128005F3B97 /* HotLayerBlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4111C5925C1C128005F3B97 /* HotLayerBlas.swift */; };
 		D4111C5C25C1C128005F3B97 /* HotNetBlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4111C5A25C1C128005F3B97 /* HotNetBlas.swift */; };
+		D416E0CF25CA356700469A69 /* HotLayerDnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E0CD25CA356700469A69 /* HotLayerDnn.swift */; };
+		D416E0D025CA356700469A69 /* HotNetDnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E0CE25CA356700469A69 /* HotNetDnn.swift */; };
+		D416E1D925CBD37700469A69 /* HotNetConfig.Counts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E1D825CBD37700469A69 /* HotNetConfig.Counts.swift */; };
+		D416E1DD25CBD3FB00469A69 /* HotNetConfig.Buffers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E1DC25CBD3FB00469A69 /* HotNetConfig.Buffers.swift */; };
 		D435E70425A2664E003D4EB4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70325A2664E003D4EB4 /* main.swift */; };
 		D435E70C25A26693003D4EB4 /* HotLayerBnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */; };
+		D46F9FBE25C918D9008E863C /* HotLayerBnn.Init.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F9FBD25C918D9008E863C /* HotLayerBnn.Init.swift */; };
 		D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */; };
 		D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43125B7BD9C00A67292 /* Float16.swift */; };
 		D4A0B43F25B7F94B00A67292 /* DataSourceCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */; };
-		D4A0B4AF25BA445300A67292 /* HotNetConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */; };
+		D4A0B4AF25BA445300A67292 /* HotNetConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B4AE25BA445300A67292 /* HotNetConfig.swift */; };
 		D4BDC42025BA5B2B00190CBE /* HotNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDC41F25BA5B2B00190CBE /* HotNet.swift */; };
 		D4BDC44625BAAB0000190CBE /* HotNetCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDC44525BAAB0000190CBE /* HotNetCnn.swift */; };
 		D4BDC44925BAAC3800190CBE /* HotNetBnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDC44825BAAC3800190CBE /* HotNetBnn.swift */; };
@@ -36,13 +41,18 @@
 		D40FBE4525B139E70057010D /* HotLayerMps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerMps.swift; sourceTree = "<group>"; };
 		D4111C5925C1C128005F3B97 /* HotLayerBlas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HotLayerBlas.swift; path = HotNet/HotLayerBlas.swift; sourceTree = SOURCE_ROOT; };
 		D4111C5A25C1C128005F3B97 /* HotNetBlas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HotNetBlas.swift; path = HotNet/HotNetBlas.swift; sourceTree = SOURCE_ROOT; };
+		D416E0CD25CA356700469A69 /* HotLayerDnn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HotLayerDnn.swift; path = HotNet/HotLayerDnn.swift; sourceTree = SOURCE_ROOT; };
+		D416E0CE25CA356700469A69 /* HotNetDnn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HotNetDnn.swift; path = HotNet/HotNetDnn.swift; sourceTree = SOURCE_ROOT; };
+		D416E1D825CBD37700469A69 /* HotNetConfig.Counts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfig.Counts.swift; path = HotNet/HotNetConfig.Counts.swift; sourceTree = SOURCE_ROOT; };
+		D416E1DC25CBD3FB00469A69 /* HotNetConfig.Buffers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfig.Buffers.swift; path = HotNet/HotNetConfig.Buffers.swift; sourceTree = SOURCE_ROOT; };
 		D435E70025A2664E003D4EB4 /* Hotnet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Hotnet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D435E70325A2664E003D4EB4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerBnn.swift; sourceTree = "<group>"; };
+		D46F9FBD25C918D9008E863C /* HotLayerBnn.Init.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotLayerBnn.Init.swift; path = HotNet/HotLayerBnn.Init.swift; sourceTree = SOURCE_ROOT; };
 		D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerCnn.swift; sourceTree = "<group>"; };
 		D4A0B43125B7BD9C00A67292 /* Float16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Float16.swift; sourceTree = "<group>"; };
 		D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCnn.swift; sourceTree = "<group>"; };
-		D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfiguration.swift; path = HotNet/HotNetConfiguration.swift; sourceTree = SOURCE_ROOT; };
+		D4A0B4AE25BA445300A67292 /* HotNetConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfig.swift; path = HotNet/HotNetConfig.swift; sourceTree = SOURCE_ROOT; };
 		D4BDC41F25BA5B2B00190CBE /* HotNet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNet.swift; path = HotNet/HotNet.swift; sourceTree = SOURCE_ROOT; };
 		D4BDC44525BAAB0000190CBE /* HotNetCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetCnn.swift; path = HotNet/HotNetCnn.swift; sourceTree = SOURCE_ROOT; };
 		D4BDC44825BAAC3800190CBE /* HotNetBnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetBnn.swift; path = HotNet/HotNetBnn.swift; sourceTree = SOURCE_ROOT; };
@@ -78,17 +88,22 @@
 		D435E70225A2664E003D4EB4 /* Hotnet */ = {
 			isa = PBXGroup;
 			children = (
+				D4BDC41F25BA5B2B00190CBE /* HotNet.swift */,
+				D4A0B4AE25BA445300A67292 /* HotNetConfig.swift */,
+				D416E1DC25CBD3FB00469A69 /* HotNetConfig.Buffers.swift */,
+				D416E1D825CBD37700469A69 /* HotNetConfig.Counts.swift */,
+				D4111C5A25C1C128005F3B97 /* HotNetBlas.swift */,
+				D4111C5925C1C128005F3B97 /* HotLayerBlas.swift */,
+				D4BDC44825BAAC3800190CBE /* HotNetBnn.swift */,
+				D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */,
+				D46F9FBD25C918D9008E863C /* HotLayerBnn.Init.swift */,
+				D4BDC44525BAAB0000190CBE /* HotNetCnn.swift */,
+				D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */,
+				D416E0CE25CA356700469A69 /* HotNetDnn.swift */,
+				D416E0CD25CA356700469A69 /* HotLayerDnn.swift */,
+				D40FBE4525B139E70057010D /* HotLayerMps.swift */,
 				D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */,
 				D4A0B43125B7BD9C00A67292 /* Float16.swift */,
-				D4111C5925C1C128005F3B97 /* HotLayerBlas.swift */,
-				D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */,
-				D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */,
-				D40FBE4525B139E70057010D /* HotLayerMps.swift */,
-				D4BDC41F25BA5B2B00190CBE /* HotNet.swift */,
-				D4111C5A25C1C128005F3B97 /* HotNetBlas.swift */,
-				D4BDC44825BAAC3800190CBE /* HotNetBnn.swift */,
-				D4BDC44525BAAB0000190CBE /* HotNetCnn.swift */,
-				D4A0B4AE25BA445300A67292 /* HotNetConfiguration.swift */,
 				D435E70325A2664E003D4EB4 /* main.swift */,
 			);
 			path = Hotnet;
@@ -121,7 +136,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					D435E6FF25A2664E003D4EB4 = {
 						CreatedOnToolsVersion = 12.3;
@@ -155,13 +170,18 @@
 				D435E70C25A26693003D4EB4 /* HotLayerBnn.swift in Sources */,
 				D4111C5B25C1C128005F3B97 /* HotLayerBlas.swift in Sources */,
 				D4BDC44925BAAC3800190CBE /* HotNetBnn.swift in Sources */,
+				D416E1D925CBD37700469A69 /* HotNetConfig.Counts.swift in Sources */,
 				D4BDC44625BAAB0000190CBE /* HotNetCnn.swift in Sources */,
 				D4A0B43F25B7F94B00A67292 /* DataSourceCnn.swift in Sources */,
 				D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */,
 				D435E70425A2664E003D4EB4 /* main.swift in Sources */,
+				D416E1DD25CBD3FB00469A69 /* HotNetConfig.Buffers.swift in Sources */,
+				D416E0CF25CA356700469A69 /* HotLayerDnn.swift in Sources */,
+				D416E0D025CA356700469A69 /* HotNetDnn.swift in Sources */,
 				D4BDC42025BA5B2B00190CBE /* HotNet.swift in Sources */,
 				D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */,
-				D4A0B4AF25BA445300A67292 /* HotNetConfiguration.swift in Sources */,
+				D46F9FBE25C918D9008E863C /* HotLayerBnn.Init.swift in Sources */,
+				D4A0B4AF25BA445300A67292 /* HotNetConfig.swift in Sources */,
 				D4111C5C25C1C128005F3B97 /* HotNetBlas.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +308,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DD983V4X84;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -308,6 +329,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = DD983V4X84;
 				ENABLE_HARDENED_RUNTIME = YES;

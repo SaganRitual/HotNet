@@ -12,7 +12,7 @@ class HotNetBnn: HotNet {
     }
 
     init(
-        _ configuration: HotNetConfiguration,
+        _ configuration: HotNetConfig,
         biases: UnsafeMutableRawPointer,
         weights: UnsafeMutableRawPointer,
         callbackDispatch: DispatchQueue = DispatchQueue.main
@@ -34,6 +34,7 @@ class HotNetBnn: HotNet {
         super.init(outputBuffer: outputBuffer, callbackDispatch: callbackDispatch)
     }
 
+    @discardableResult
     override func activate(
         input: UnsafeRawPointer
     ) -> UnsafeBufferPointer<Float> {
@@ -62,7 +63,7 @@ class HotNetBnn: HotNet {
 
 private extension HotNetBnn {
     static func makeLayers(
-        _ configuration: HotNetConfiguration,
+        _ configuration: HotNetConfig,
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?
     ) -> ([UnsafeMutableRawPointer], [HotLayerBnn]) {

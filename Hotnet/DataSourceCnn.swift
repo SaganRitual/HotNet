@@ -22,7 +22,7 @@ class DataSourceCnn: NSObject, MPSCNNConvolutionDataSource {
     func dataType() ->   MPSDataType { .float32 }
     func descriptor() -> MPSCNNConvolutionDescriptor { convolutionDescriptor }
     func weights() ->    UnsafeMutableRawPointer { pWeights! }
-    func biasTerms() ->  UnsafeMutablePointer<Float>? { pBiases! }
+    func biasTerms() ->  UnsafeMutablePointer<Float>? { pBiases }
 
     func load() -> Bool { true }
 
