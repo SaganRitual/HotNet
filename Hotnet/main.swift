@@ -19,7 +19,7 @@ func fBytes(cElements: Int = 1) -> Int { MemoryLayout<Float>.size * cElements }
 let configuration = HotNetConfig(
     activation: .identity,
     layerDescriptors: [
-        .init(cNeurons: 1), .init(cNeurons: 1), .init(cNeurons: 1)
+        .init(cNeurons: 2), .init(cNeurons: 2), .init(cNeurons: 1)
     ]
 )
 

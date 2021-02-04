@@ -41,7 +41,7 @@ class HotNetCnn: HotNet {
         )
 
         let finalOutputNeurons =
-            configuration.layerDescriptors.last!.cNeurons
+            configuration.counts.perLayerCounts.last!.cNeurons
 
         self.finalOutputBuffer = UnsafeMutableRawPointer.allocate(
             byteCount: finalOutputNeurons * MemoryLayout<Float>.size,
@@ -118,7 +118,22 @@ class HotNetCnn: HotNet {
 
     func onActivationComplete(_: MTLCommandBuffer) {
         getActivationResult()
-        super.callbackDispatch.async { [self] in onComplete!(outputBuffer) }
+
+        let outputImage = intermediateImages.last!
+        let width = outputImage.width, height = outputImage.height
+        let fc = outputImage.featureChannels
+        let count = width * height * fc
+
+        let t = finalOutputBuffer.assumingMemoryBound(to: UInt16.self)
+        let f = UnsafeMutableBufferPointer(start: t, count: count)
+
+        let output16_ = UnsafeBufferPointer(f)
+        let output16 = output16_.map { $0 }
+        let output32 = Float16.float16s_to_floats(values: output16)
+
+        output32.withUnsafeBufferPointer { p in
+            super.callbackDispatch.async { [self] in onComplete!(p) }
+        }
     }
 
     func setupInputBuffer(_ floatBuffer: UnsafeRawPointer) -> MPSImage {
@@ -137,18 +152,18 @@ class HotNetCnn: HotNet {
         let outputImage = intermediateImages.last!
         let width = outputImage.width, height = outputImage.height
         let fc = outputImage.featureChannels, texture = outputImage.texture
-        let count =  width * height * fc
+//        let count =  width * height * fc
         let numSlices = (fc + 3)/4
 
         let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
                                size: MTLSize(width: width, height: height, depth: 1))
 
-        let t = finalOutputBuffer.assumingMemoryBound(to: Float.self)
-        let f = UnsafeMutableBufferPointer(start: t, count: count)
+//        let t = finalOutputBuffer.assumingMemoryBound(to: Float.self)
+//        let f = UnsafeMutableBufferPointer(start: t, count: count)
 
         for i in 0..<numSlices {
-          texture.getBytes(&(f[width * height * 4 * i]),
-                           bytesPerRow: width * 4 * MemoryLayout<Float>.size,
+          texture.getBytes(finalOutputBuffer,
+                           bytesPerRow: width * MemoryLayout<Float>.size,
                            bytesPerImage: 0,
                            from: region,
                            mipmapLevel: 0,
@@ -177,7 +192,7 @@ private extension HotNetCnn {
 
             let image = MPSImage(device: device, imageDescriptor: descriptor)
 
-            if !buffers.isOutputLayer { intermediateImages.append(image) }
+            intermediateImages.append(image)
 
             defer { buffers.advanceLayer() }
 
