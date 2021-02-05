@@ -100,8 +100,11 @@ private extension HotNetBnn {
                 )
             }
 
+            let isPoolingLayer = HotNet.isInputLayer(upperLayerIndex)
+
             return HotLayerBnn(
-                cNeuronsIn: inputs.cNeurons, cNeuronsOut: outputs.cNeurons,
+                isPoolingLayer: isPoolingLayer,
+                cNeuronsThisLayer: inputs.cNeurons, cNeuronsNextLayerDown: outputs.cNeurons,
                 biases: pBiases, weights: pWeights,
                 outputBuffer: intermediateBuffer,
                 activation: HotLayerBnn.getActivation(configuration.activation)

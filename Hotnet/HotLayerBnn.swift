@@ -3,8 +3,8 @@
 import Accelerate
 
 class HotLayerBnn {
-    let cNeuronsIn: Int
-    let cNeuronsOut: Int
+    let cNeuronsThisLayer: Int
+    let cNeuronsNextLayerDown: Int
 
     let activation: BNNSActivation
     let filter: BNNSFilter
@@ -12,21 +12,31 @@ class HotLayerBnn {
     var outputBuffer: UnsafeMutableRawPointer
 
     init(
-        cNeuronsIn: Int, cNeuronsOut: Int,
+        isPoolingLayer: Bool, cNeuronsThisLayer: Int, cNeuronsNextLayerDown: Int,
         biases: UnsafeMutableRawPointer?,
         weights: UnsafeMutableRawPointer?,
         outputBuffer: UnsafeMutableRawPointer,
         activation: BNNSActivation = .init(function: .tanh)
     ) {
-        self.cNeuronsIn = cNeuronsIn
-        self.cNeuronsOut = cNeuronsOut
+        self.cNeuronsThisLayer = cNeuronsThisLayer
+        self.cNeuronsNextLayerDown = cNeuronsNextLayerDown
         self.outputBuffer = outputBuffer
         self.activation = activation
 
-        self.filter = HotLayerBnn.configureFullyConnectedLayer(
-            cNeuronsIn: cNeuronsIn, cNeuronsOut: cNeuronsOut,
-            biases: biases, weights: weights, activation: activation
-        )
+        let side = Int(sqrt((Double(cNeuronsThisLayer))))
+
+        self.filter = isPoolingLayer ?
+            HotLayerBnn.configureInputPoolingLayer(
+                kernelWidth: side, kernelHeight: side,
+                biases: biases, weights: weights
+            )
+            
+            :
+
+            HotLayerBnn.configureFullyConnectedLayer(
+                cNeuronsIn: cNeuronsThisLayer, cNeuronsOut: cNeuronsNextLayerDown,
+                biases: biases, weights: weights, activation: activation
+            )
     }
 
     deinit { BNNSFilterDestroy(filter) }

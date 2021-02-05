@@ -6,7 +6,7 @@ import Foundation
 class HotNet {
     static let netDispatch = DispatchQueue(
         label: "net.dispatch.rob",
-        attributes: .concurrent,
+//        attributes: .concurrent,
         target: DispatchQueue.global()
     )
 

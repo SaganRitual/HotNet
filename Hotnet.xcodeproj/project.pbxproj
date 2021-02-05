@@ -13,9 +13,11 @@
 		D416E0D025CA356700469A69 /* HotNetDnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E0CE25CA356700469A69 /* HotNetDnn.swift */; };
 		D416E1D925CBD37700469A69 /* HotNetConfig.Counts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E1D825CBD37700469A69 /* HotNetConfig.Counts.swift */; };
 		D416E1DD25CBD3FB00469A69 /* HotNetConfig.Buffers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E1DC25CBD3FB00469A69 /* HotNetConfig.Buffers.swift */; };
+		D416E1E125CC6A3600469A69 /* AuxNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D416E1E025CC6A3600469A69 /* AuxNet.swift */; };
 		D435E70425A2664E003D4EB4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70325A2664E003D4EB4 /* main.swift */; };
 		D435E70C25A26693003D4EB4 /* HotLayerBnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */; };
 		D46F9FBE25C918D9008E863C /* HotLayerBnn.Init.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46F9FBD25C918D9008E863C /* HotLayerBnn.Init.swift */; };
+		D4979A7525CDBCFB002D4BEA /* SwiftPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4979A7425CDBCFB002D4BEA /* SwiftPointer.swift */; };
 		D4A0B41C25B6671C00A67292 /* HotLayerCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */; };
 		D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43125B7BD9C00A67292 /* Float16.swift */; };
 		D4A0B43F25B7F94B00A67292 /* DataSourceCnn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */; };
@@ -45,10 +47,12 @@
 		D416E0CE25CA356700469A69 /* HotNetDnn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HotNetDnn.swift; path = HotNet/HotNetDnn.swift; sourceTree = SOURCE_ROOT; };
 		D416E1D825CBD37700469A69 /* HotNetConfig.Counts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfig.Counts.swift; path = HotNet/HotNetConfig.Counts.swift; sourceTree = SOURCE_ROOT; };
 		D416E1DC25CBD3FB00469A69 /* HotNetConfig.Buffers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotNetConfig.Buffers.swift; path = HotNet/HotNetConfig.Buffers.swift; sourceTree = SOURCE_ROOT; };
+		D416E1E025CC6A3600469A69 /* AuxNet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuxNet.swift; path = HotNet/AuxNet.swift; sourceTree = SOURCE_ROOT; };
 		D435E70025A2664E003D4EB4 /* Hotnet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Hotnet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D435E70325A2664E003D4EB4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D435E70B25A26693003D4EB4 /* HotLayerBnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerBnn.swift; sourceTree = "<group>"; };
 		D46F9FBD25C918D9008E863C /* HotLayerBnn.Init.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HotLayerBnn.Init.swift; path = HotNet/HotLayerBnn.Init.swift; sourceTree = SOURCE_ROOT; };
+		D4979A7425CDBCFB002D4BEA /* SwiftPointer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPointer.swift; sourceTree = "<group>"; };
 		D4A0B41B25B6671C00A67292 /* HotLayerCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotLayerCnn.swift; sourceTree = "<group>"; };
 		D4A0B43125B7BD9C00A67292 /* Float16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Float16.swift; sourceTree = "<group>"; };
 		D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCnn.swift; sourceTree = "<group>"; };
@@ -104,7 +108,9 @@
 				D40FBE4525B139E70057010D /* HotLayerMps.swift */,
 				D4A0B43E25B7F94B00A67292 /* DataSourceCnn.swift */,
 				D4A0B43125B7BD9C00A67292 /* Float16.swift */,
+				D4979A7425CDBCFB002D4BEA /* SwiftPointer.swift */,
 				D435E70325A2664E003D4EB4 /* main.swift */,
+				D416E1E025CC6A3600469A69 /* AuxNet.swift */,
 			);
 			path = Hotnet;
 			sourceTree = "<group>";
@@ -175,6 +181,8 @@
 				D4A0B43F25B7F94B00A67292 /* DataSourceCnn.swift in Sources */,
 				D4A0B43225B7BD9C00A67292 /* Float16.swift in Sources */,
 				D435E70425A2664E003D4EB4 /* main.swift in Sources */,
+				D416E1E125CC6A3600469A69 /* AuxNet.swift in Sources */,
+				D4979A7525CDBCFB002D4BEA /* SwiftPointer.swift in Sources */,
 				D416E1DD25CBD3FB00469A69 /* HotNetConfig.Buffers.swift in Sources */,
 				D416E0CF25CA356700469A69 /* HotLayerDnn.swift in Sources */,
 				D416E0D025CA356700469A69 /* HotNetDnn.swift in Sources */,

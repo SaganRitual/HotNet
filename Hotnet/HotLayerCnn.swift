@@ -45,6 +45,7 @@ class HotLayerCnn {
 //        )
 
         self.filter = MPSCNNFullyConnected(device: device, weights: dataSource)
+        self.filter.offset = MPSOffset(x: 0, y: 0, z: 0)
     }
 
     func encodeActivation(inputImage: MPSImage, commandBuffer: MTLCommandBuffer) {
